@@ -17,26 +17,27 @@ client = discord.Client()
 channel = None
 
 async def log_solve(row):
-    print('Team `{row["name"]}` solved challenge `{row["data"]["name"]}`. Congrats!')
+    solve_str = f'Team `{row["name"]}` solved challenge `{json.loads(row["data"])["name"]}`. Congrats!'
+    print(solve_str)
+    await channel.send(solve_str)
 
 async def main():
     conn = await asyncpg.connect(
         host='localhost', user=DBUSER, password=DBPASS, database=DBNAME)
-    solves_count = None
+    solves_seen = None
     try:
-        await conn.set_type_codec('json', encoder=json.dumps, decoder=json.loads, schema='pg_catalog')
         while True:
             print('Checking solves')
             rows = await conn.fetch(
                 'SELECT challenges.data, users.name FROM '
                 '(solves INNER JOIN challenges ON solves.challengeid=challenges.id) '
                 'INNER JOIN users ON solves.userid=users.id')
-            # rows = await conn.fetch(f'SELECT * FROM {SOLVE_TABLE}')
-            if solves_count is None:
-                solves_count = len(rows)
-            for new_row in rows[solves_count:]:
-                await log_solve(new_row)
-            solves_count = len(rows)
+            if solves_seen is None:
+                solves_seen = set(rows)
+            for row in rows:
+                if row not in solves_seen:
+                    await log_solve(row)
+                    solves_seen.add(row)
             await asyncio.sleep(10)
     finally:
         await conn.close()
