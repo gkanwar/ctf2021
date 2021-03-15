@@ -1,0 +1,13 @@
+services:
+  server:
+    build: .
+    ports:
+      - 8003:5000
+    depends_on:
+      - db
+  db:
+    image: postgres:10
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_PASSWORD=dummypassword

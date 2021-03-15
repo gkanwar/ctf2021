@@ -1,0 +1,12 @@
+{
+    "name": "dot_dot",
+    "version": "13.3.7",
+    "main": "server.js",
+    "scripts": {
+	"start": "node server.js"
+    },
+    "dependencies": {
+	"express": "^4.0.0",
+	"dotenv": "^8.2.0"
+    }
+}
