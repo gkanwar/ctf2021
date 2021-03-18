@@ -12,50 +12,46 @@ conn = psycopg2.connect(database="postgres", user="postgres", password="dummypas
 @app.route('/api/v1/secrets', methods=['GET'])
 def get_secrets():
     if 'api_key' not in request.args:
-        return 'Error: api_key required\n'
+        return json.dumps({'error': 'api_key required'})
     if 'hmac' not in request.args:
-        return 'Error: hmac required\n'
+        return json.dumps({'error': 'hmac required'})
     api_key = request.args['api_key']
     hmac = request.args['hmac']
     with conn.cursor() as cur:
         cur.execute('SELECT id,enc_key FROM users WHERE api_key=%s', [api_key])
         row = cur.fetchone()
         if row is None:
-            return f'Error: api_key not found {api_key}\n'
+            return json.dumps({'error': f'api_key not found {api_key}'})
         user_id, enc_key = row
         enc_key = bytes.fromhex(enc_key)
 
-    print('query_string:', file=sys.stderr, flush=True)
-    print(request.query_string.decode(), file=sys.stderr, flush=True)
     h = SHA256.new()
     remaining_query_string = request.query_string.decode()
     remaining_query_string = re.sub(r'&hmac=[^&]+', '', remaining_query_string)
     remaining_query_string = re.sub(r'hmac=[^&]+&', '', remaining_query_string)
-    print('remaining_query_string:', file=sys.stderr, flush=True)
-    print(remaining_query_string, file=sys.stderr, flush=True)
     h.update(enc_key + remaining_query_string.encode())
     server_hmac = h.hexdigest()
     if server_hmac != hmac:
-        return 'Error: HMAC mismatch\n'
+        return json.dumps({'error': 'HMAC mismatch'})
     
     query_string = request.query_string.decode()
     args = {}
     for arg in query_string.split('&'):
         if '=' not in arg:
-            return 'Error: Malformatted query string\n'
+            return json.dumps({'error': 'Malformatted query string'})
         key, val = arg.split('=', 1)
         args[key] = val
 
     if 'action' not in args:
-        return 'Error: action required\n'
+        return json.dumps({'error': 'action required'})
     if 'timestamp' not in args:
-        return 'Error: timestamp required\n'
+        return json.dumps({'error': 'timestamp required'})
 
     try:
         if int(args['timestamp']) < time.time() - 30.0:
-            return 'Error: stale request\n'
+            return json.dumps({'error': 'stale request'})
     except:
-        return 'Error: timestamp decoding failed\n'
+        return json.dumps({'error': 'timestamp decoding failed'})
 
     if args['action'] == 'read':
         out = []
@@ -65,7 +61,7 @@ def get_secrets():
                 out.append(record[0])
         return json.dumps(out) + '\n'
     else:
-        return f'Error: unknown action {args["action"]}\n'
+        return json.dumps({'error': f'unknown action {args["action"]}'})
 
 @app.route('/', methods=['GET'])
 def index():

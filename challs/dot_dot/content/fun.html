@@ -23,12 +23,28 @@
 <main class="container">
   <div class="starter-template text-center py-5 px-3">
     <h1>Some Fun</h1>
+    <p> Credit: Pedro Verruma. See the <a href="https://pmav.eu/stuff/javascript-game-of-life-v3.1.1/assets/LICENSE">License</a>. </p>
     <script src="https://pmav.eu/stuff/javascript-game-of-life-v3.1.1/assets/js/json-sans-eval.js"></script>
     <script src="https://pmav.eu/stuff/javascript-game-of-life-v3.1.1/assets/js/css-browser-selector.js"></script>
     <script src="https://pmav.eu/stuff/javascript-game-of-life-v3.1.1/assets/js/game-of-life-v3.1.1.js"></script>
-    <canvas id="canvas" width="901" height="433"/>
-    <script type="text/javascript">
-      GOL.helpers.registerEvent(window, 'load', GOL.handlers.buttons.run, false);
-    </script>
+    <canvas id="canvas" width="901" height="433"></canvas>
+
+    <span style="display:none">
+      <span id="hint"></span>
+      <span id="generation"></span>
+      <span id="livecells"></span>
+      <span id="steptime"></span>
+      <span id="layoutMessages"></span>
+      <input type="button" id="buttonExport"/>
+      <input type="button" id="buttonTrail"/>
+      <input type="button" id="buttonGrid"/>
+      <input type="button" id="buttonColors"/>
+    </span>
+
+    <form action="">
+      <input type="button" value="Run" id="buttonRun"/>
+      <input type="button" value="Step" id="buttonStep"/>
+      <input type="button" value="Clear" id="buttonClear"/>
+    </form>
   </div>
 </main>
