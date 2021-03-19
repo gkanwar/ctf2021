@@ -1,0 +1,5 @@
+services:
+  good_hmac:
+    build: ./
+    ports:
+      - 8005:8888
