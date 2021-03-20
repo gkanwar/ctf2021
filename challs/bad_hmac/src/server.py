@@ -4,6 +4,7 @@ import psycopg2
 import re
 import sys
 import time
+import urllib
 from Crypto.Hash import SHA256
 
 app = Flask(__name__)
@@ -26,10 +27,10 @@ def get_secrets():
         enc_key = bytes.fromhex(enc_key)
 
     h = SHA256.new()
-    remaining_query_string = request.query_string.decode()
-    remaining_query_string = re.sub(r'&hmac=[^&]+', '', remaining_query_string)
-    remaining_query_string = re.sub(r'hmac=[^&]+&', '', remaining_query_string)
-    h.update(enc_key + remaining_query_string.encode())
+    remaining_query_string = urllib.parse.unquote_to_bytes(request.query_string.decode())
+    remaining_query_string = re.sub(rb'&hmac=[^&]+', b'', remaining_query_string)
+    remaining_query_string = re.sub(rb'hmac=[^&]+&', b'', remaining_query_string)
+    h.update(enc_key + remaining_query_string)
     server_hmac = h.hexdigest()
     if server_hmac != hmac:
         return json.dumps({'error': 'HMAC mismatch'})
@@ -70,4 +71,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=False)
