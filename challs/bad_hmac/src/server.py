@@ -8,7 +8,6 @@ import urllib
 from Crypto.Hash import SHA256
 
 app = Flask(__name__)
-conn = psycopg2.connect(database="postgres", user="postgres", password="dummypassword", host="db")
 
 @app.route('/api/v1/secrets', methods=['GET'])
 def get_secrets():
@@ -18,10 +17,12 @@ def get_secrets():
         return json.dumps({'error': 'hmac required'})
     api_key = request.args['api_key']
     hmac = request.args['hmac']
+    conn = psycopg2.connect(database="postgres", user="postgres", password="dummypassword", host="db")
     with conn.cursor() as cur:
         cur.execute('SELECT id,enc_key FROM users WHERE api_key=%s', [api_key])
         row = cur.fetchone()
         if row is None:
+            conn.close()
             return json.dumps({'error': f'api_key not found {api_key}'})
         user_id, enc_key = row
         enc_key = bytes.fromhex(enc_key)
