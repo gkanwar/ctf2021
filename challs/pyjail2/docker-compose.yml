@@ -1,0 +1,5 @@
+services:
+  pyjail2:
+    build: ./
+    ports:
+      - 8006:8888
