@@ -1,0 +1,23 @@
+ctfName: TejCTF2021
+meta:
+  description: 'Reincarnation of a friendly CTF in Spring 2021'
+  imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Glider.svg/1024px-Glider.svg.png'
+homeContent: |
+  # TejCTF 2021
+  It's 2021, the pandemic continues, and I need an excuse to procrastinate writing my thesis. The obvious conclusion is that I'll be running a CTF! Date/time: **Mar 20, 2-6pm ET**.
+
+  ## Registration
+  Please have one member of your team register and share the login link around (it's token based). Let me know if you have trouble receiving the link via email. You can also copy it directly from the website if needed. All flag submission and scoring happens here!
+
+  ## Rules / Info
+  1. Please do not attack comptetition infrastructure / other teams.
+  2. None of the challenges require significant brute-forcing, so please avoid spamming requests to any competition services.
+  3. Flag format is `tejctf{[0-9a-z_]+}`
+  4. Scoring is not based on time of solution, but challenges solved by fewer teams are worth more points in the end.
+  5. Have fun! If you're stuck, let me know. I'm happy to drop mild hints to keep the ball rolling :)
+
+  ## Countdown
+  <timer></timer>
+faviconUrl: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe18oGAcqDGDxh-S2DgmqNpu1RFyAGwlsmXA
+leaderboard:
+  graphSampleTime: 300000

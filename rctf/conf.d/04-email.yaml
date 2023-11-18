@@ -1,0 +1,8 @@
+email:
+  from: REDACTED
+  provider:
+    name: emails/ses
+    options:
+      awsKeyId: REDACTED
+      awsKeySecret: REDACTED
+      awsRegion: us-east-2

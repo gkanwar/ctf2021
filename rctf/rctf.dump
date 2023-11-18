@@ -1,0 +1,390 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.3 (Debian 12.3-1.pgdg100+1)
+-- Dumped by pg_dump version 12.3 (Debian 12.3-1.pgdg100+1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: rctf; Type: DATABASE; Schema: -; Owner: rctf
+--
+
+CREATE DATABASE rctf WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.utf8' LC_CTYPE = 'en_US.utf8';
+
+
+ALTER DATABASE rctf OWNER TO rctf;
+
+\connect rctf
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: citext; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION citext; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION citext IS 'data type for case-insensitive character strings';
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: challenges; Type: TABLE; Schema: public; Owner: rctf
+--
+
+CREATE TABLE public.challenges (
+    id text NOT NULL,
+    data jsonb NOT NULL
+);
+
+
+ALTER TABLE public.challenges OWNER TO rctf;
+
+--
+-- Name: pgmigrations; Type: TABLE; Schema: public; Owner: rctf
+--
+
+CREATE TABLE public.pgmigrations (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    run_on timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.pgmigrations OWNER TO rctf;
+
+--
+-- Name: pgmigrations_id_seq; Type: SEQUENCE; Schema: public; Owner: rctf
+--
+
+CREATE SEQUENCE public.pgmigrations_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pgmigrations_id_seq OWNER TO rctf;
+
+--
+-- Name: pgmigrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rctf
+--
+
+ALTER SEQUENCE public.pgmigrations_id_seq OWNED BY public.pgmigrations.id;
+
+
+--
+-- Name: solves; Type: TABLE; Schema: public; Owner: rctf
+--
+
+CREATE TABLE public.solves (
+    id text NOT NULL,
+    challengeid text NOT NULL,
+    userid text NOT NULL,
+    createdat timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.solves OWNER TO rctf;
+
+--
+-- Name: user_members; Type: TABLE; Schema: public; Owner: rctf
+--
+
+CREATE TABLE public.user_members (
+    id text NOT NULL,
+    userid text NOT NULL,
+    email text NOT NULL
+);
+
+
+ALTER TABLE public.user_members OWNER TO rctf;
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: rctf
+--
+
+CREATE TABLE public.users (
+    id text NOT NULL,
+    name public.citext NOT NULL,
+    email text,
+    division text NOT NULL,
+    perms integer NOT NULL,
+    ctftime_id text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT require_email_or_ctftime_id CHECK (((email IS NOT NULL) OR (ctftime_id IS NOT NULL)))
+);
+
+
+ALTER TABLE public.users OWNER TO rctf;
+
+--
+-- Name: pgmigrations id; Type: DEFAULT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.pgmigrations ALTER COLUMN id SET DEFAULT nextval('public.pgmigrations_id_seq'::regclass);
+
+
+--
+-- Data for Name: challenges; Type: TABLE DATA; Schema: public; Owner: rctf
+--
+
+COPY public.challenges (id, data) FROM stdin;
+43a53c14-8f1c-4083-bd13-2a8704790de3	{"flag": "tejctf{whoops_i_forgot_to_use_padding}", "name": "Big Primes", "files": [{"url": "http://rmrfslash.xyz/uploads?key=4e9dc17111b92bacf38862ef70e07cec18e06fc3db55ac4cd4787c74081df1e0%2Fbig_primes.txt", "name": "big_primes.txt"}, {"url": "http://rmrfslash.xyz/uploads?key=64de1ed147073232fa825f5f3fdbfc64fb481c7be8325a20e41126d3dd4b28dc%2Fencrypt.py", "name": "encrypt.py"}], "author": "tej", "points": {"max": 500, "min": 100}, "category": "Warmup", "description": "RSA is secure, right? Bigger primes are better, right??", "tiebreakEligible": true}
+4b6c12d2-3b07-4f4f-bef7-c44f2c7a727b	{"flag": "tejctf{hello_world}", "name": "Copy and Paste", "files": [], "author": "tej", "points": {"max": 100, "min": 100}, "category": "Warmup", "description": "Welcome! Let's make sure my infrastructure works, because I have some doubts.\\n\\nHere's a flag `tejctf{hello_world}`", "tiebreakEligible": false}
+bbf72880-cf6c-4786-b03b-47371061ca96	{"flag": "tejctf{probably_not}", "name": "Obscurity is Security?", "files": [], "author": "tej", "points": {"max": 300, "min": 100}, "category": "Warmup", "description": "Apparently Google was leaking some private info on my site. Good thing I got that all cleaned up.\\nhttp://rmrfslash.xyz:8001/", "tiebreakEligible": true}
+0aabbb07-1152-4315-948a-e67f99f84574	{"flag": "tejctf{ecb_is_not_semantically_secure}", "name": "Electronic CodeBad", "files": [{"url": "http://rmrfslash.xyz/uploads?key=de83274eb2d7329318dd32f79578d23e9de7478870c41ee3b9a66350310e5449%2Fflag.enc", "name": "flag.enc"}, {"url": "http://rmrfslash.xyz/uploads?key=37c5fab4e5e5bd0ac0fdb3747f29de7ae61b5cc1cec1ed279e21fa6ccdefe9ec%2Faes_ecb.py", "name": "aes_ecb.py"}], "author": "tej", "points": {"max": 500, "min": 100}, "category": "Warmup", "description": "We captured the RGBA8888 framebuffer directly from a suspect's kernel, but they used AES encryption for privacy. Recover the contents of the framebuffer? Hint: https://rawpixels.net/ may be useful for visualizing a raw framebuffer.", "tiebreakEligible": true}
+a7bbe070-92fd-4b86-b5c3-d490a06a1f4e	{"flag": "tejctf{some_subtle_hmac_issues_with_long_keys}", "name": "Good HMAC", "files": [{"url": "http://rmrfslash.xyz/uploads?key=f09dfd103a5999a2b9650f5124455eedda506b474cad47c10ddc2af5caac20a5%2Fgood_hmac.py", "name": "good_hmac.py"}], "author": "tej", "points": {"max": 1000, "min": 100}, "category": "Crypto", "description": "This time we did HMAC right.\\n\\nnc rmrfslash.xyz 8005", "tiebreakEligible": true}
+e3e5c309-24d6-4990-8d74-7fc191c70919	{"flag": "tejctf{sql_injection_never_gets_old}", "name": "Obligatory SQLi", "files": [], "author": "tej", "points": {"max": 1000, "min": 100}, "category": "Web", "description": "Gotta have at least one of these.\\nhttp://rmrfslash.xyz:8007/", "tiebreakEligible": true}
+fd3e42ba-6b05-4a55-aad4-5d385cab7d54	{"flag": "tejctf{dunder_class_is_a_get_out_of_jail_free_card}", "name": "PyJail", "files": [{"url": "http://rmrfslash.xyz/uploads?key=7248f7b565d3fa3f8eb53ac824aece9311e00f0e52b15035f102bf3e36a91331%2Fpyjail.py", "name": "pyjail.py"}], "author": "tej", "points": {"max": 1000, "min": 100}, "category": "Jail", "description": "Do not pass go, do not collect $200.\\n\\nnc rmrfslash.xyz 8004", "tiebreakEligible": true}
+7d2a63b9-9cb8-41b4-8212-b8b7ec57a39f	{"flag": "tejctf{pyjails_are_really_hard_to_implement}", "name": "PyJail2", "files": [{"url": "http://rmrfslash.xyz/uploads?key=2451f940b86b1547072aa21054da0bbdef40e7452a0ce740fb0019fb68fd6d66%2Fpyjail.py", "name": "pyjail.py"}], "author": "tej", "points": {"max": 1000, "min": 100}, "category": "Jail", "description": "I really locked it down this time.\\n\\nnc rmrfslash.xyz 8006", "tiebreakEligible": true}
+bacc2f25-8f4d-4712-920f-4aa9eb11ed9c	{"flag": "tejctf{homebrew_hmac_is_a_bad_idea}", "name": "Bad HMAC", "files": [{"url": "http://rmrfslash.xyz/uploads?key=ad6920b693572ee150de4153b1dfc3a474cc93e59e0bb84447a34bdc41601e24%2Frequest.txt", "name": "request.txt"}, {"url": "http://rmrfslash.xyz/uploads?key=1f9fe3399a744d63fc58895520222b8b38fedaff545e76fe06f562120c432cc4%2Fmake_request.py", "name": "make_request.py"}], "author": "tej", "points": {"max": 1500, "min": 100}, "category": "Crypto", "description": "We captured a request to the secrets hosting API http://rmrfslash.xyz:8003/. The request is stale, but can you get the secret anyway? The attached file has a test API and encryption key to test out the API.\\n\\nWARNING: This challenge is quite hard.", "tiebreakEligible": true}
+7123837a-e014-400d-8c5b-66e35222f926	{"flag": "tejctf{apparently_the_next_directory_up}", "name": "Dot Dot! Who's There?", "files": [{"url": "http://rmrfslash.xyz/uploads?key=f9e8876e94825243b57d64a550aa034e1aa8860cb6b495215c763107ba5d6a59%2Fserver.js", "name": "server.js"}], "author": "tej", "points": {"max": 1000, "min": 100}, "category": "Web", "description": "http://rmrfslash.xyz:8002/", "tiebreakEligible": true}
+f05ac130-7871-4a58-9b90-164f7fee1acf	{"flag": "tejctf{hardcoded_passwords_dont_fool_me}", "name": "Just Login", "files": [{"url": "http://rmrfslash.xyz/uploads?key=dc8d8b49d24c0747a3bc631a4376e9bdf434a80e7ce5d7a34fe7a8711a8fae00%2Flogin", "name": "login"}], "author": "tej", "points": {"max": 300, "min": 100}, "category": "Warmup", "description": "Just login...", "tiebreakEligible": true}
+\.
+
+
+--
+-- Data for Name: pgmigrations; Type: TABLE DATA; Schema: public; Owner: rctf
+--
+
+COPY public.pgmigrations (id, name, run_on) FROM stdin;
+1	1581292018019_add-users	2021-03-07 20:30:13.706965
+2	1581292025458_user-perms	2021-03-07 20:30:13.720115
+3	1581297115194_add-solves	2021-03-07 20:30:13.723028
+4	1581725957097_del-password	2021-03-07 20:30:13.729456
+5	1581840671046_add-solve-createdat	2021-03-07 20:30:13.735965
+6	1581917595746_add-solves-primary-key	2021-03-07 20:30:13.739193
+7	1582424634372_string-uuids	2021-03-07 20:30:13.744922
+8	1582446586521_foreign-key-userid	2021-03-07 20:30:13.768038
+9	1585799727940_add-ctftime-id	2021-03-07 20:30:13.776585
+10	1587352163274_add-user-members	2021-03-07 20:30:13.783396
+11	1587950739709_challenge-data	2021-03-07 20:30:13.792649
+12	1590976823599_del-name-grade	2021-03-07 20:30:13.799695
+13	1591166544932_citext_name	2021-03-07 20:30:13.802668
+14	1591915539134_indices	2021-03-07 20:30:13.862639
+15	1591923901993_string-uuids	2021-03-07 20:30:13.871433
+16	1592008739015_add-user-createdat	2021-03-07 20:30:13.882765
+17	1597827385452_timezone	2021-03-07 20:30:13.887419
+\.
+
+
+--
+-- Data for Name: solves; Type: TABLE DATA; Schema: public; Owner: rctf
+--
+
+COPY public.solves (id, challengeid, userid, createdat) FROM stdin;
+e2efd010-8f52-4c3b-bb69-d77c86738b97	4b6c12d2-3b07-4f4f-bef7-c44f2c7a727b	9542ed80-a54b-45df-9ede-5a3a8eb61f20	2021-03-20 18:00:24.22+00
+83768ddb-3fa5-4329-b3b6-1c87035f43b9	4b6c12d2-3b07-4f4f-bef7-c44f2c7a727b	c2b6ece7-a8ee-444a-b7dc-191b95158e0e	2021-03-20 18:00:51.663+00
+0c24794a-3fd9-4dca-b22a-2830bbfa8109	bbf72880-cf6c-4786-b03b-47371061ca96	c2b6ece7-a8ee-444a-b7dc-191b95158e0e	2021-03-20 18:02:29.864+00
+80f571fa-3913-4d07-942e-7d8b8f5b4bb8	e3e5c309-24d6-4990-8d74-7fc191c70919	9542ed80-a54b-45df-9ede-5a3a8eb61f20	2021-03-20 18:07:12.859+00
+5f5d582a-2ae5-4146-9c31-d70c4887b01b	f05ac130-7871-4a58-9b90-164f7fee1acf	9542ed80-a54b-45df-9ede-5a3a8eb61f20	2021-03-20 18:09:18.077+00
+29eaf6ca-7792-4f9c-a3c1-76dccb07a3a1	4b6c12d2-3b07-4f4f-bef7-c44f2c7a727b	7c130486-4789-45f4-8222-36f75ca644dc	2021-03-20 18:10:30.083+00
+38f2e090-7922-4e7c-96bc-0bbd1fe6aa63	bbf72880-cf6c-4786-b03b-47371061ca96	9542ed80-a54b-45df-9ede-5a3a8eb61f20	2021-03-20 18:10:57.503+00
+f4bfab2d-f205-4f6d-9ad9-2959d403a130	4b6c12d2-3b07-4f4f-bef7-c44f2c7a727b	b8bcc226-3039-498c-b49d-fe85e650680f	2021-03-20 18:20:38.53+00
+c2848f80-272d-4758-9aab-568515dabedd	0aabbb07-1152-4315-948a-e67f99f84574	9542ed80-a54b-45df-9ede-5a3a8eb61f20	2021-03-20 18:23:10.814+00
+31d54399-67eb-4ae1-966f-fd06602d099f	7123837a-e014-400d-8c5b-66e35222f926	9542ed80-a54b-45df-9ede-5a3a8eb61f20	2021-03-20 18:27:20.63+00
+a6b5871c-95c1-49a6-b2ef-427adffbc7cd	f05ac130-7871-4a58-9b90-164f7fee1acf	b8bcc226-3039-498c-b49d-fe85e650680f	2021-03-20 18:28:04.318+00
+34dc9846-f446-4317-9afe-206eeb781ba3	43a53c14-8f1c-4083-bd13-2a8704790de3	9542ed80-a54b-45df-9ede-5a3a8eb61f20	2021-03-20 18:33:17.231+00
+cba4878e-7509-4afb-949c-18404b949e8b	f05ac130-7871-4a58-9b90-164f7fee1acf	7c130486-4789-45f4-8222-36f75ca644dc	2021-03-20 18:34:36.693+00
+44c3e82e-df4b-4d7b-a48c-39206ebddb7f	43a53c14-8f1c-4083-bd13-2a8704790de3	b8bcc226-3039-498c-b49d-fe85e650680f	2021-03-20 18:38:26.476+00
+88b52d4d-9688-4c96-b402-bfc69902fe33	0aabbb07-1152-4315-948a-e67f99f84574	c2b6ece7-a8ee-444a-b7dc-191b95158e0e	2021-03-20 18:50:03.631+00
+8e7f56a4-c704-4cc0-b88c-1d1f7cbee356	e3e5c309-24d6-4990-8d74-7fc191c70919	c2b6ece7-a8ee-444a-b7dc-191b95158e0e	2021-03-20 18:53:05.495+00
+f3b3095b-582a-406e-8c8f-a7d06627d3a4	fd3e42ba-6b05-4a55-aad4-5d385cab7d54	9542ed80-a54b-45df-9ede-5a3a8eb61f20	2021-03-20 19:02:45.613+00
+446fe116-9f3a-4fb2-aebd-6ff3ce62c541	fd3e42ba-6b05-4a55-aad4-5d385cab7d54	7c130486-4789-45f4-8222-36f75ca644dc	2021-03-20 19:11:03.92+00
+1e1a38a8-3457-4e8b-b60b-c9704dba5ebf	7d2a63b9-9cb8-41b4-8212-b8b7ec57a39f	9542ed80-a54b-45df-9ede-5a3a8eb61f20	2021-03-20 19:23:26.662+00
+dfb0ef3c-a3da-4e6f-9511-533e32612cd1	7123837a-e014-400d-8c5b-66e35222f926	c2b6ece7-a8ee-444a-b7dc-191b95158e0e	2021-03-20 19:26:39.988+00
+119bab57-cff0-47bb-9b69-3c20c1f2fdd0	a7bbe070-92fd-4b86-b5c3-d490a06a1f4e	9542ed80-a54b-45df-9ede-5a3a8eb61f20	2021-03-20 19:26:59.701+00
+b9f27140-429a-4405-84be-eb9545c9124f	0aabbb07-1152-4315-948a-e67f99f84574	b8bcc226-3039-498c-b49d-fe85e650680f	2021-03-20 19:50:44.506+00
+5328dfe2-c566-4f8d-b0b8-8d3ef07d3dd9	bbf72880-cf6c-4786-b03b-47371061ca96	b8bcc226-3039-498c-b49d-fe85e650680f	2021-03-20 19:57:53.087+00
+7f48d93a-43e4-4caf-a132-01598308cd27	fd3e42ba-6b05-4a55-aad4-5d385cab7d54	c2b6ece7-a8ee-444a-b7dc-191b95158e0e	2021-03-20 20:25:59.966+00
+ce8f3444-ee67-491d-a589-cf1fe08bdf4e	f05ac130-7871-4a58-9b90-164f7fee1acf	c2b6ece7-a8ee-444a-b7dc-191b95158e0e	2021-03-20 20:34:19.25+00
+0159c5e2-9c4f-4ac8-a880-fa66dc3c6e20	bacc2f25-8f4d-4712-920f-4aa9eb11ed9c	9542ed80-a54b-45df-9ede-5a3a8eb61f20	2021-03-20 20:34:43.599+00
+9e583d49-97f3-4eeb-ae25-669683cd320d	43a53c14-8f1c-4083-bd13-2a8704790de3	c2b6ece7-a8ee-444a-b7dc-191b95158e0e	2021-03-20 20:59:55.513+00
+c6524111-0afd-4e3c-9660-a805bef2fed4	e3e5c309-24d6-4990-8d74-7fc191c70919	7c130486-4789-45f4-8222-36f75ca644dc	2021-03-20 21:45:23.049+00
+205d847a-b557-44b6-a3ef-1c6f79fef4df	43a53c14-8f1c-4083-bd13-2a8704790de3	7c130486-4789-45f4-8222-36f75ca644dc	2021-03-20 21:53:56.689+00
+\.
+
+
+--
+-- Data for Name: user_members; Type: TABLE DATA; Schema: public; Owner: rctf
+--
+
+COPY public.user_members (id, userid, email) FROM stdin;
+1a757eef-0297-4fdb-b6e1-53146dc713ec	c2b6ece7-a8ee-444a-b7dc-191b95158e0e	REDACTED
+cf0cc1cf-a7db-4ccd-b5f9-82a9f4081bcc	c2b6ece7-a8ee-444a-b7dc-191b95158e0e	REDACTED
+e2107445-6cf8-40dd-b8b9-a0ac7252935b	c2b6ece7-a8ee-444a-b7dc-191b95158e0e	REDACTED
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: rctf
+--
+
+COPY public.users (id, name, email, division, perms, ctftime_id, created_at) FROM stdin;
+499b3d09-eea2-43ec-95dc-1bcc304b91f4	test	REDACTED	open	3	\N	2021-03-07 20:34:09.10131+00
+c2b6ece7-a8ee-444a-b7dc-191b95158e0e	CorrectHorseBatteryStaple	REDACTED	open	0	\N	2021-03-18 19:24:18.915198+00
+9542ed80-a54b-45df-9ede-5a3a8eb61f20	Bread Hackers Anonymous	REDACTED	open	0	\N	2021-03-14 21:26:46.85157+00
+7c130486-4789-45f4-8222-36f75ca644dc	hackett	REDACTED	open	0	\N	2021-03-20 18:09:53.220024+00
+b8bcc226-3039-498c-b49d-fe85e650680f	Anthony	REDACTED	open	0	\N	2021-03-20 18:19:44.421987+00
+\.
+
+
+--
+-- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rctf
+--
+
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 17, true);
+
+
+--
+-- Name: challenges challenges_pkey; Type: CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.challenges
+    ADD CONSTRAINT challenges_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pgmigrations pgmigrations_pkey; Type: CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.pgmigrations
+    ADD CONSTRAINT pgmigrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: solves solves_pkey; Type: CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.solves
+    ADD CONSTRAINT solves_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: solves uq; Type: CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.solves
+    ADD CONSTRAINT uq UNIQUE (challengeid, userid);
+
+
+--
+-- Name: user_members user_members_email_key; Type: CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.user_members
+    ADD CONSTRAINT user_members_email_key UNIQUE (email);
+
+
+--
+-- Name: user_members user_members_pkey; Type: CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.user_members
+    ADD CONSTRAINT user_members_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_ctftime_id_key; Type: CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_ctftime_id_key UNIQUE (ctftime_id);
+
+
+--
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- Name: users users_name_key; Type: CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_name_key UNIQUE (name);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: solves_createdat_index; Type: INDEX; Schema: public; Owner: rctf
+--
+
+CREATE INDEX solves_createdat_index ON public.solves USING btree (createdat);
+
+
+--
+-- Name: solves_userid_index; Type: INDEX; Schema: public; Owner: rctf
+--
+
+CREATE INDEX solves_userid_index ON public.solves USING btree (userid);
+
+
+--
+-- Name: user_members_userid_index; Type: INDEX; Schema: public; Owner: rctf
+--
+
+CREATE INDEX user_members_userid_index ON public.user_members USING btree (userid);
+
+
+--
+-- Name: solves uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.solves
+    ADD CONSTRAINT uuid_fkey FOREIGN KEY (userid) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: user_members uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rctf
+--
+
+ALTER TABLE ONLY public.user_members
+    ADD CONSTRAINT uuid_fkey FOREIGN KEY (userid) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
